@@ -58,8 +58,7 @@ function normalizeField(field, fullFieldPath, state, previousState, values, prev
       state && state[field.key],
       previousState && previousState[field.key],
       values,
-      previousValues,
-      previousState
+      previousValues
     );
     return field.isArray ? result && result.map(makeFieldValue) : result;
   } else if (field.nestedPath) {
@@ -86,7 +85,8 @@ function normalizeField(field, fullFieldPath, state, previousState, values, prev
     finalField.value,
     previousState && previousState[field.key] && previousState[field.key].value,
     values,
-    previousValues
+    previousValues,
+    previousState
   );
 
   return makeFieldValue(finalField);
