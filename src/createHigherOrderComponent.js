@@ -50,7 +50,9 @@ const createHigherOrderComponent = (config,
           this.fields = readFields(nextProps, this.props, this.fields, this.asyncValidate, isReactNative);
         }
         if (!deepEqual(this.props.initialValues, nextProps.initialValues)) {
-          this.props.initialize(nextProps.initialValues, nextProps.fields);
+          this.props.initialize(nextProps.initialValues,
+            nextProps.fields,
+            this.props.overwriteOnInitialValuesChange || !this.props.form._initialized);
         }
       }
 
@@ -61,7 +63,7 @@ const createHigherOrderComponent = (config,
       }
 
       asyncValidate(name, value) {
-        const {asyncValidate, dispatch, fields, form, startAsyncValidation, stopAsyncValidation, validate} = this.props;
+        const {alwaysAsyncValidate, asyncValidate, dispatch, fields, form, startAsyncValidation, stopAsyncValidation, validate} = this.props;
         const isSubmitting = !name;
         if (asyncValidate) {
           const values = getValues(fields, form);
@@ -74,8 +76,9 @@ const createHigherOrderComponent = (config,
 
           // if blur validating, only run async validate if sync validation passes
           // and submitting (not blur validation) or form is dirty or form was never initialized
+          // unless alwaysAsyncValidate is true
           const syncValidationPasses = isSubmitting || isValid(syncErrors[name]);
-          if (syncValidationPasses && (isSubmitting || !allPristine || !initialized)) {
+          if (alwaysAsyncValidate || (syncValidationPasses && (isSubmitting || !allPristine || !initialized))) {
             return asyncValidation(() =>
               asyncValidate(values, dispatch, this.props), startAsyncValidation, stopAsyncValidation, name);
           }
@@ -100,7 +103,7 @@ const createHigherOrderComponent = (config,
 
       render() {
         const allFields = this.fields;
-        const {addArrayValue, asyncBlurFields, blur, change, destroy, focus, fields, form, initialValues, initialize,
+        const {addArrayValue, asyncBlurFields, autofill, blur, change, destroy, focus, fields, form, initialValues, initialize,
           onSubmit, propNamespace, reset, removeArrayValue, returnRejectedSubmitPromise, startAsyncValidation,
           startSubmit, stopAsyncValidation, stopSubmit, submitFailed, swapArrayValues, touch, untouch, validate,
           ...passableProps} = this.props; // eslint-disable-line no-redeclare
@@ -145,6 +148,7 @@ const createHigherOrderComponent = (config,
     ReduxForm.WrappedComponent = WrappedComponent;
     ReduxForm.propTypes = {
       // props:
+      alwaysAsyncValidate: PropTypes.bool,
       asyncBlurFields: PropTypes.arrayOf(PropTypes.string),
       asyncValidate: PropTypes.func,
       dispatch: PropTypes.func.isRequired,
@@ -152,6 +156,9 @@ const createHigherOrderComponent = (config,
       form: PropTypes.object,
       initialValues: PropTypes.any,
       onSubmit: PropTypes.func,
+      onSubmitSuccess: PropTypes.func,
+      onSubmitFail: PropTypes.func,
+      overwriteOnInitialValuesChange: PropTypes.bool.isRequired,
       propNamespace: PropTypes.string,
       readonly: PropTypes.bool,
       returnRejectedSubmitPromise: PropTypes.bool,
@@ -160,6 +167,7 @@ const createHigherOrderComponent = (config,
 
       // actions:
       addArrayValue: PropTypes.func.isRequired,
+      autofill: PropTypes.func.isRequired,
       blur: PropTypes.func.isRequired,
       change: PropTypes.func.isRequired,
       destroy: PropTypes.func.isRequired,

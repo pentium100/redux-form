@@ -1,6 +1,6 @@
 {
   "name": "redux-form",
-  "version": "5.0.1",
+  "version": "5.2.3",
   "description": "A higher order component decorator for forms using Redux and React",
   "main": "./lib/index.js",
   "jsnext:main": "./src/index.js",
@@ -81,7 +81,7 @@
     "eslint-plugin-react": "^3.16.1",
     "expect": "^1.14.0",
     "isparta": "^4.0.0",
-    "jsdom": "~5.4.3",
+    "jsdom": "^8.4.1",
     "mocha": "^2.4.5",
     "mocha-lcov-reporter": "^1.1.0",
     "react": "^15.0.0",

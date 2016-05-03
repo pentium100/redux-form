@@ -1,4 +1,4 @@
-import { ADD_ARRAY_VALUE, BLUR, CHANGE, DESTROY, FOCUS, INITIALIZE, REMOVE_ARRAY_VALUE, RESET, START_ASYNC_VALIDATION,
+import { ADD_ARRAY_VALUE, AUTOFILL, BLUR, CHANGE, DESTROY, FOCUS, INITIALIZE, REMOVE_ARRAY_VALUE, RESET, START_ASYNC_VALIDATION,
   START_SUBMIT, STOP_ASYNC_VALIDATION, STOP_SUBMIT, SUBMIT_FAILED, SWAP_ARRAY_VALUES, TOUCH, UNTOUCH } from './actionTypes';
 import mapValues from './mapValues';
 import read from './read';
@@ -35,6 +35,12 @@ const behaviors = {
     }
     return write(path, arrayCopy, stateCopy);
   },
+  [AUTOFILL](state, {field, value}) {
+    return write(field, previous => {
+      const {asyncError, submitError, ...result} = {...previous, value, autofilled: true};
+      return makeFieldValue(result);
+    }, state);
+  },
   [BLUR](state, {field, value, touch}) {
     // remove _active from state
     const {_active, ...stateCopy} = state;  // eslint-disable-line prefer-const
@@ -51,7 +57,7 @@ const behaviors = {
   },
   [CHANGE](state, {field, value, touch}) {
     return write(field, previous => {
-      const {asyncError, submitError, ...result} = {...previous, value};
+      const {asyncError, submitError, autofilled, ...result} = {...previous, value};
       if (touch) {
         result.touched = true;
       }
@@ -66,9 +72,9 @@ const behaviors = {
     stateCopy._active = field;
     return stateCopy;
   },
-  [INITIALIZE](state, {data, fields}) {
+  [INITIALIZE](state, {data, fields, overwriteValues}) {
     return {
-      ...initializeState(data, fields, state),
+      ...initializeState(data, fields, state, overwriteValues),
       _asyncValidating: false,
       _active: undefined,
       [globalErrorKey]: undefined,
