@@ -100,9 +100,10 @@ const readField = (state, fieldName, pathToHere = '', fields, syncErrors, asyncV
     let subobject = fields[key] || {};
     const nextPath = pathToHere + key + '.';
     const nextKey = getNextKey(rest);
+    const nextPrefix = prefix + key + '.';
     const previous = subobject[nextKey];
     const result = readField(state[key] || {}, rest, nextPath, subobject, syncErrors, asyncValidate,
-      isReactNative, props, callback, nextPath);
+      isReactNative, props, callback, nextPrefix);
     if (result !== previous) {
       subobject = {
         ...subobject,
@@ -117,7 +118,8 @@ const readField = (state, fieldName, pathToHere = '', fields, syncErrors, asyncV
   if (field.name !== name) {
     const onChange = createOnChange(name, change, isReactNative);
     const initialFormValue = read(`${name}.initial`, form);
-    const initialValue = initialFormValue || read(name, initialValues);
+    let initialValue = initialFormValue || read(name, initialValues);
+    initialValue = initialValue === undefined ? '' : initialValue;
     field.name = name;
     field.checked = initialValue === true || undefined;
     field.value = initialValue;
@@ -138,7 +140,12 @@ const readField = (state, fieldName, pathToHere = '', fields, syncErrors, asyncV
     Object.defineProperty(field, '_isField', {value: true});
   }
 
-  const fieldState = (fieldName ? state[fieldName] : state) || {};
+  const defaultFieldState = {
+    initial: field.value,
+    value: field.value,
+  };
+
+  const fieldState = (fieldName ? state[fieldName] : state) || defaultFieldState;
   const syncError = read(name, syncErrors);
   const updated = updateField(field, fieldState, name === form._active, syncError);
   if (fieldName || fields[fieldName] !== updated) {

@@ -1,4 +1,5 @@
 import expect from 'expect';
+import {createStore} from 'redux';
 import reducer, {globalErrorKey} from '../reducer';
 import bindActionData from '../bindActionData';
 import {addArrayValue, autofill, blur, change, focus, initialize, removeArrayValue, reset, startAsyncValidation, startSubmit,
@@ -57,7 +58,8 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: undefined
+            value: undefined,
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -81,7 +83,8 @@ describe('reducer', () => {
         myField: {
           myArray: [
             {
-              value: undefined
+              value: undefined,
+              _isFieldValue: true
             }
           ]
         },
@@ -107,7 +110,8 @@ describe('reducer', () => {
         myField: {
           myArray: [
             {
-              value: 20
+              value: 20,
+              _isFieldValue: true
             }
           ]
         },
@@ -149,13 +153,16 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -197,13 +204,16 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           },
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -360,7 +370,7 @@ describe('reducer', () => {
               initial: {a: 'bar-a2', b: 'bar-b2'},
               value: {a: 'bar-a2', b: 'bar-b2'},
             })
-          },
+          }
         ],
         _active: undefined,
         _asyncValidating: false,
@@ -383,32 +393,38 @@ describe('reducer', () => {
             foo: {
               initial: {a: 'foo-a1', b: 'foo-b1'},
               value: {a: 'foo-a1', b: 'foo-b1'},
+              _isFieldValue: true
             },
             bar: {
               initial: {a: 'bar-a1', b: 'bar-b1'},
               value: {a: 'bar-a1', b: 'bar-b1'},
+              _isFieldValue: true
             }
           },
           {
             foo: {
               initial: {a: 'foo-a2', b: 'foo-b2'},
               value: {a: 'foo-a2', b: 'foo-b2'},
+              _isFieldValue: true
             },
             bar: {
               initial: {a: 'bar-a2', b: 'bar-b2'},
               value: {a: 'bar-a2', b: 'bar-b2'},
+              _isFieldValue: true
             }
           },
           {
             foo: {
               initial: {a: 'foo-a3', b: 'foo-b3'},
               value: {a: 'foo-a3', b: 'foo-b3'},
+              _isFieldValue: true
             },
             bar: {
               initial: {a: 'bar-a3', b: 'bar-b3'},
               value: {a: 'bar-a3', b: 'bar-b3'},
+              _isFieldValue: true
             }
-          },
+          }
         ],
         _active: undefined,
         _asyncValidating: false,
@@ -501,59 +517,69 @@ describe('reducer', () => {
               {
                 foo: {
                   initial: 'foo-1-1',
-                  value: 'foo-1-1'
+                  value: 'foo-1-1',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-1-1',
-                  value: 'bar-1-1'
+                  value: 'bar-1-1',
+                  _isFieldValue: true
                 }
               },
               {
                 foo: {
                   initial: 'foo-1-2',
-                  value: 'foo-1-2'
+                  value: 'foo-1-2',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-1-2',
-                  value: 'bar-1-2'
+                  value: 'bar-1-2',
+                  _isFieldValue: true
                 }
-              },
-            ],
+              }
+            ]
           },
           {
             myField2: [
               {
                 foo: {
                   initial: 'foo-2-1',
-                  value: 'foo-2-1'
+                  value: 'foo-2-1',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-2-1',
-                  value: 'bar-2-1'
+                  value: 'bar-2-1',
+                  _isFieldValue: true
                 }
               },
               {
                 foo: {
                   initial: 'foo-2-2',
-                  value: 'foo-2-2'
+                  value: 'foo-2-2',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-2-2',
-                  value: 'bar-2-2'
+                  value: 'bar-2-2',
+                  _isFieldValue: true
                 }
               },
               {
                 foo: {
                   initial: 'foo-2-3',
-                  value: 'foo-2-3'
+                  value: 'foo-2-3',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-2-3',
-                  value: 'bar-2-3'
+                  value: 'bar-2-3',
+                  _isFieldValue: true
                 }
-              },
-            ],
-          },
+              }
+            ]
+          }
         ],
         _active: undefined,
         _asyncValidating: false,
@@ -593,7 +619,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'myValue',
-          autofilled: true
+          autofilled: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -626,7 +653,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'different',
-          autofilled: true
+          autofilled: true,
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -646,7 +674,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'myValue'
+          value: 'myValue',
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -667,7 +696,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -702,7 +732,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -738,7 +769,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -771,7 +803,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: undefined,
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -790,7 +823,7 @@ describe('reducer', () => {
             value: undefined
           })
         },
-        _active: 'myField',
+        _active: 'myField.mySubField',
         _asyncValidating: false,
         [globalErrorKey]: undefined,
         _initialized: false,
@@ -807,7 +840,8 @@ describe('reducer', () => {
         myField: {
           mySubField: {
             value: 'hello',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         },
         _asyncValidating: false,
@@ -826,7 +860,7 @@ describe('reducer', () => {
         myArray: [
           makeFieldValue({value: undefined})
         ],
-        _active: 'myField',
+        _active: 'myArray[0]',
         _asyncValidating: false,
         [globalErrorKey]: undefined,
         _initialized: false,
@@ -843,7 +877,8 @@ describe('reducer', () => {
         myArray: [
           {
             value: 'hello',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         ],
         _asyncValidating: false,
@@ -863,7 +898,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'myValue'
+          value: 'myValue',
+          _isFieldValue: true
         },
         _active: undefined, // CHANGE doesn't touch _active
         _asyncValidating: false,
@@ -885,7 +921,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined, // CHANGE doesn't touch _active
         _asyncValidating: false,
@@ -922,7 +959,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -956,7 +994,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'different'
+          value: 'different',
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -989,7 +1028,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'different'
+          value: 'different',
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -1010,7 +1050,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           mySubField: {
-            value: 'myValue'
+            value: 'myValue',
+            _isFieldValue: true
           }
         },
         _active: undefined, // CHANGE doesn't touch _active
@@ -1032,7 +1073,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          visited: true
+          visited: true,
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -1053,7 +1095,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           subField: {
-            visited: true
+            visited: true,
+            _isFieldValue: true
           }
         },
         _active: 'myField.subField',
@@ -1091,7 +1134,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'initialValue',
-          visited: true
+          visited: true,
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -1112,7 +1156,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'initialValue',
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1133,11 +1178,13 @@ describe('reducer', () => {
       .toEqual({
         bar: {
           initial: 'baz',
-          value: 'baz'
+          value: 'baz',
+          _isFieldValue: true
         },
         dog: {
           initial: null,
-          value: null
+          value: null,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1160,7 +1207,8 @@ describe('reducer', () => {
         myField: {
           subField: {
             initial: 'initialValue',
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -1184,7 +1232,8 @@ describe('reducer', () => {
         myField: [
           {
             initial: 'initialValue',
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1220,21 +1269,25 @@ describe('reducer', () => {
           {
             name: {
               initial: 'Bobby Tables',
-              value: 'Bobby Tables'
+              value: 'Bobby Tables',
+              _isFieldValue: true
             },
             email: {
               initial: 'bobby@gmail.com',
-              value: 'bobby@gmail.com'
+              value: 'bobby@gmail.com',
+              _isFieldValue: true
             }
           },
           {
             name: {
               initial: 'Sammy Tables',
-              value: 'Sammy Tables'
+              value: 'Sammy Tables',
+              _isFieldValue: true
             },
             email: {
               initial: 'sammy@gmail.com',
-              value: 'sammy@gmail.com'
+              value: 'sammy@gmail.com',
+              _isFieldValue: true
             }
           }
         ],
@@ -1277,7 +1330,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'cleanValue',
-          value: 'cleanValue'
+          value: 'cleanValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1312,7 +1366,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'cleanValue',
-          value: 'dirtyValue'
+          value: 'dirtyValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1350,7 +1405,8 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1420,10 +1476,12 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1467,10 +1525,12 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1541,13 +1601,16 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           },
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           },
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1593,13 +1656,16 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1645,13 +1711,16 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1696,11 +1765,13 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'initialValue',
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
-          value: 'otherInitialValue'
+          value: 'otherInitialValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1744,11 +1815,13 @@ describe('reducer', () => {
         deepField: {
           myField: {
             initial: 'initialValue',
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           myOtherField: {
             initial: 'otherInitialValue',
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -1816,7 +1889,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'initialValue',
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         doesnt: 'matter',
         should: 'notchange',
@@ -1926,12 +2000,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myField'
           },
           myOtherField: {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myOtherField'
           }
         },
@@ -1985,12 +2061,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myField'
           },
           {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myOtherField'
           }
         ],
@@ -2039,12 +2117,14 @@ describe('reducer', () => {
           initial: 'initialValue',
           value: 'dirtyValue',
           touched: true,
+          _isFieldValue: true,
           asyncError: 'Error about myField'
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
           touched: true,
+          _isFieldValue: true,
           asyncError: 'Error about myOtherField'
         },
         _active: undefined,
@@ -2089,12 +2169,14 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'dirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2138,12 +2220,14 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'dirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2223,12 +2307,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myField'
           },
           myOtherField: {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myOtherField'
           }
         },
@@ -2282,12 +2368,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myField'
           },
           {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myOtherField'
           }
         ],
@@ -2365,12 +2453,14 @@ describe('reducer', () => {
           initial: 'initialValue',
           value: 'dirtyValue',
           touched: true,
+          _isFieldValue: true,
           submitError: 'Error about myField'
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
           touched: true,
+          _isFieldValue: true,
           submitError: 'Error about myOtherField'
         },
         _active: undefined,
@@ -2415,12 +2505,14 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'dirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2459,11 +2551,13 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'initialValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           value: 'otherInitialValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2487,7 +2581,7 @@ describe('reducer', () => {
           myOtherField: makeFieldValue({
             value: 'otherInitialValue',
             touched: false
-          }),
+          })
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2505,11 +2599,13 @@ describe('reducer', () => {
         deep: {
           myField: {
             value: 'initialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           },
           myOtherField: {
             value: 'otherInitialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -2553,11 +2649,13 @@ describe('reducer', () => {
         myFields: [
           {
             value: 'initialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           },
           {
             value: 'otherInitialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2601,11 +2699,13 @@ describe('reducer', () => {
         myFields: [
           {
             value: 'initialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           },
           {
             value: 'otherInitialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2654,13 +2754,15 @@ describe('reducer', () => {
           {
             name: {
               value: 'initialValue',
-              touched: true
+              touched: true,
+              _isFieldValue: true
             }
           },
           {
             name: {
               value: 'otherInitialValue',
-              touched: true
+              touched: true,
+              _isFieldValue: true
             }
           }
         ],
@@ -2753,10 +2855,12 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         myOtherField: {
-          value: 'otherInitialValue'
+          value: 'otherInitialValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2797,10 +2901,12 @@ describe('reducer', () => {
       .toEqual({
         deep: {
           myField: {
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           myOtherField: {
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -2843,10 +2949,12 @@ describe('reducer', () => {
       .toEqual({
         myFields: [
           {
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           {
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2889,10 +2997,12 @@ describe('reducer', () => {
       .toEqual({
         myFields: [
           {
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           {
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2940,12 +3050,14 @@ describe('reducer', () => {
         myFields: [
           {
             name: {
-              value: 'initialValue'
+              value: 'initialValue',
+              _isFieldValue: true
             }
           },
           {
             name: {
-              value: 'otherInitialValue'
+              value: 'otherInitialValue',
+              _isFieldValue: true
             }
           }
         ],
@@ -3100,11 +3212,13 @@ describe('reducer', () => {
           _submitting: false,
           _submitFailed: false,
           myField: {
-            value: 'normalized'
+            value: 'normalized',
+            _isFieldValue: true
           },
           person: {
             name: {
-              value: 'John Doe'
+              value: 'John Doe',
+              _isFieldValue: true
             }
           },
           pets: []
@@ -3150,11 +3264,13 @@ describe('reducer', () => {
           firstSubform: {
             ...defaultFields,
             myField: {
-              value: 'normalized'
+              value: 'normalized',
+              _isFieldValue: true
             },
             person: {
               name: {
-                value: 'John Doe'
+                value: 'John Doe',
+                _isFieldValue: true
               }
             },
             pets: []
@@ -3165,11 +3281,13 @@ describe('reducer', () => {
           firstSubform: {
             ...defaultFields,
             myField: {
-              value: 'normalized'
+              value: 'normalized',
+              _isFieldValue: true
             },
             person: {
               name: {
-                value: 'John Doe'
+                value: 'John Doe',
+                _isFieldValue: true
               }
             },
             pets: []
@@ -3177,11 +3295,13 @@ describe('reducer', () => {
           secondSubForm: {
             ...defaultFields,
             myField: {
-              value: 'normalized'
+              value: 'normalized',
+              _isFieldValue: true
             },
             person: {
               name: {
-                value: 'John Doe'
+                value: 'John Doe',
+                _isFieldValue: true
               }
             },
             pets: []
@@ -3213,11 +3333,22 @@ describe('reducer', () => {
           person: {
             name: {
               value: 'John Doe',
+              _isFieldValue: true
             }
           },
           pets: [
-            {name: {value: 'Fido'}},
-            {name: {value: 'Tucker'}}
+            {
+              name: {
+                value: 'Fido',
+                _isFieldValue: true
+              }
+            },
+            {
+              name: {
+                value: 'Tucker',
+                _isFieldValue: true
+              }
+            }
           ]
         }
       });
@@ -3230,16 +3361,28 @@ describe('reducer', () => {
         .toEqual({
           ...defaultFields,
           name: {
-            value: 'normalized'
+            value: 'normalized',
+            _isFieldValue: true
           },
           person: {
             name: {
-              value: 'JOHN DOE'
+              value: 'JOHN DOE',
+              _isFieldValue: true
             }
           },
           pets: [
-            {name: {value: 'fido'}},
-            {name: {value: 'tucker'}}
+            {
+              name: {
+                value: 'fido',
+                _isFieldValue: true
+              }
+            },
+            {
+              name: {
+                value: 'tucker',
+                _isFieldValue: true
+              }
+            }
           ]
         });
     });
@@ -3282,17 +3425,20 @@ describe('reducer', () => {
         .toEqual({
           ...defaultFields,
           name: {
-            value: 'DOG'
+            value: 'DOG',
+            _isFieldValue: true
           },
           person: {
             name: {
-              value: 'JOHN DOE'
+              value: 'JOHN DOE',
+              _isFieldValue: true
             }
           },
           pets: [{
             name: {
               initial: 'Fido',
-              value: 'fido'
+              value: 'fido',
+              _isFieldValue: true
             }
           }]
         });
@@ -3309,17 +3455,20 @@ describe('reducer', () => {
         .toEqual({
           ...defaultFields,
           name: {
-            value: undefined
+            value: undefined,
+            _isFieldValue: true
           },
           person: {
             name: {
-              value: undefined
+              value: undefined,
+              _isFieldValue: true
             }
           },
           pets: [{
             name: {
               initial: 'Fido',
-              value: 'fido'
+              value: 'fido',
+              _isFieldValue: true
             }
           }]
         });
@@ -3442,51 +3591,127 @@ describe('reducer', () => {
         .toBeA('object')
         .toEqual({
           ...defaultFields,
-          name: {value: 'normalized'},
+          name: {
+            value: 'normalized',
+            _isFieldValue: true
+          },
           person: {
-            name: {value: 'JOHN DOE'}
+            name: {
+              value: 'JOHN DOE',
+              _isFieldValue: true
+            }
           },
           pets: [
-            {name: {value: 'fido'}},
-            {name: {value: 'tucker'}}
+            {
+              name: {
+                value: 'fido',
+                _isFieldValue: true
+              }
+            },
+            {
+              name: {
+                value: 'tucker',
+                _isFieldValue: true
+              }
+            }
           ],
           cats: [
-            {value: 'LION'},
-            {value: 'PANTHER'},
-            {value: 'GARFIELD'},
-            {value: 'WHISKERS'}
+            {
+              value: 'LION',
+              _isFieldValue: true
+            },
+            {
+              value: 'PANTHER',
+              _isFieldValue: true
+            },
+            {
+              value: 'GARFIELD',
+              _isFieldValue: true
+            },
+            {
+              value: 'WHISKERS',
+              _isFieldValue: true
+            }
           ],
           programming: [{
             langs: [
-              {value: 'f#'},
-              {value: 'haskell'},
-              {value: 'lisp'},
-              {value: 'ml'},
-              {value: 'ocaml'}
+              {
+                value: 'f#',
+                _isFieldValue: true
+              },
+              {
+                value: 'haskell',
+                _isFieldValue: true
+              },
+              {
+                value: 'lisp',
+                _isFieldValue: true
+              },
+              {
+                value: 'ml',
+                _isFieldValue: true
+              },
+              {
+                value: 'ocaml',
+                _isFieldValue: true
+              }
             ]
           }, {
             langs: [
-              {value: 'c#'},
-              {value: 'c++'},
-              {value: 'java'},
-              {value: 'ruby'},
-              {value: 'smalltalk'}
+              {
+                value: 'c#',
+                _isFieldValue: true
+              },
+              {
+                value: 'c++',
+                _isFieldValue: true
+              },
+              {
+                value: 'java',
+                _isFieldValue: true
+              },
+              {
+                value: 'ruby',
+                _isFieldValue: true
+              },
+              {
+                value: 'smalltalk',
+                _isFieldValue: true
+              }
             ]
           }],
           some: {
             numbers: [
-              {value: 2},
-              {value: 4},
-              {value: 6},
-              {value: 8},
-              {value: 10}
+              {
+                value: 2,
+                _isFieldValue: true
+              },
+              {
+                value: 4,
+                _isFieldValue: true
+              },
+              {
+                value: 6,
+                _isFieldValue: true
+              },
+              {
+                value: 8,
+                _isFieldValue: true
+              },
+              {
+                value: 10,
+                _isFieldValue: true
+              }
             ]
           },
           a: {
             very: {
               deep: {
                 object: {
-                  property: {value: 'TEST'}
+                  property: {
+                    value: 'TEST',
+                    _isFieldValue: true
+                  }
                 }
               }
             }
@@ -3494,33 +3719,75 @@ describe('reducer', () => {
           my: [{
             deeply: [{
               nested: {
-                item: {value: 'HELLO'},
-                not: {value: 'lost'}
+                item: {
+                  value: 'HELLO',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
               },
-              otherKey: {value: 'Goodbye'}
+              otherKey: {
+                value: 'Goodbye',
+                _isFieldValue: true
+              }
             }, {
               nested: {
-                item: {value: 'HOLA'},
-                not: {value: 'lost'}
+                item: {
+                  value: 'HOLA',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
               },
-              otherKey: {value: 'Adios'}
+              otherKey: {
+                value: 'Adios',
+                _isFieldValue: true
+              }
             }],
-            stays: {value: 'intact'}
+            stays: {
+              value: 'intact',
+              _isFieldValue: true
+            }
           }, {
             deeply: [{
               nested: {
-                item: {value: 'WORLD'},
-                not: {value: 'lost'}
+                item: {
+                  value: 'WORLD',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
               },
-              otherKey: {value: 'Later'}
+              otherKey: {
+                value: 'Later',
+                _isFieldValue: true
+              }
             }, {
               nested: {
-                item: {value: 'MUNDO'},
-                not: {value: 'lost'}
+                item: {
+                  value: 'MUNDO',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
               },
-              otherKey: {value: 'Hasta luego'}
+              otherKey: {
+                value: 'Hasta luego',
+                _isFieldValue: true
+              }
             }],
-            stays: {value: 'intact'}
+            stays: {
+              value: 'intact',
+              _isFieldValue: true
+            }
           }]
         });
       expect(isFieldValue(state.foo.name)).toBe(true);
@@ -3562,5 +3829,28 @@ describe('reducer', () => {
       expect(isFieldValue(state.foo.my[1].deeply[1].otherKey)).toBe(true);
       expect(isFieldValue(state.foo.my[1].stays)).toBe(true);
     });
+  });
+
+  it('should flag the correct field as active', () => {
+    const store = createStore(reducer);
+
+    store.dispatch({form: 'foo', ...initialize({}, ['a', 'b'])});
+    store.dispatch({form: 'foo', ...focus('a')});
+    store.dispatch({form: 'foo', ...focus('b')});
+
+    expect(store.getState()).toMatch({
+      foo: {_active: 'b'}
+    });
+
+    store.dispatch({form: 'foo', ...blur('a')});
+
+    expect(store.getState()).toMatch({
+      foo: {_active: 'b'}
+    });
+
+    store.dispatch({form: 'foo', ...blur('b')});
+
+    expect(store.getState().foo)
+      .toExcludeKey('_active');
   });
 });

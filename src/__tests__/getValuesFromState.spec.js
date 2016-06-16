@@ -176,6 +176,15 @@ describe('getValuesFromState', () => {
       });
   });
 
+  it('should ignore empty values from state', () => {
+    const state = {
+      name: makeFieldValue({}),
+    };
+    expect(getValuesFromState(state))
+      .toBeA('object')
+      .toEqual({});
+  });
+
   it('should ignore values starting with _', () => {
     const state = {
       foo: makeFieldValue({
@@ -226,5 +235,24 @@ describe('getValuesFromState', () => {
           animals: [{key: 'k1', value: 'v1'}, {key: 'k2', value: 'v2'}]
         }
       });
+  });
+
+  it('should retrieve values from recreated state', () => {
+    const initialState = {
+      foo: makeFieldValue({
+        value: 'bar'
+      })
+    };
+
+    expect(getValuesFromState(initialState)).toEqual({
+      foo: 'bar'
+    });
+
+    const serializedState = JSON.stringify(initialState);
+    const unSerializedState = JSON.parse(serializedState);
+
+    expect(getValuesFromState(unSerializedState)).toEqual({
+      foo: 'bar'
+    });
   });
 });
