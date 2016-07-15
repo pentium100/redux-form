@@ -86,7 +86,7 @@ function normalizeField(field, fullFieldPath, state, previousState, values, prev
     previousState && previousState[field.key] && previousState[field.key].value,
     values,
     previousValues,
-    previousState
+    state
   );
 
   return makeFieldValue(finalField);
