@@ -1,4 +1,4 @@
-import { ADD_ARRAY_VALUE, BLUR, CHANGE, DESTROY, FOCUS, INITIALIZE, REMOVE_ARRAY_VALUE, RESET, START_ASYNC_VALIDATION,
+import { ADD_ARRAY_VALUE, AUTOFILL, BLUR, CHANGE, DESTROY, FOCUS, INITIALIZE, REMOVE_ARRAY_VALUE, RESET, START_ASYNC_VALIDATION,
   START_SUBMIT, STOP_ASYNC_VALIDATION, STOP_SUBMIT, SUBMIT_FAILED, SWAP_ARRAY_VALUES, TOUCH, UNTOUCH } from './actionTypes';
 import mapValues from './mapValues';
 import read from './read';
@@ -8,6 +8,7 @@ import initializeState from './initializeState';
 import resetState from './resetState';
 import setErrors from './setErrors';
 import {makeFieldValue} from './fieldValue';
+import normalizeFields from './normalizeFields';
 
 export const globalErrorKey = '_error';
 
@@ -21,12 +22,12 @@ export const initialState = {
 };
 
 const behaviors = {
-  [ADD_ARRAY_VALUE](state, {path, index, value}) {
+  [ADD_ARRAY_VALUE](state, {path, index, value, fields}) {
     const array = read(path, state);
     const stateCopy = {...state};
     const arrayCopy = array ? [...array] : [];
     const newValue = value !== null && typeof value === 'object' ?
-      initializeState(value, Object.keys(value)) : makeFieldValue({value});
+      initializeState(value, fields || Object.keys(value)) : makeFieldValue({value});
     if (index === undefined) {
       arrayCopy.push(newValue);
     } else {
@@ -34,9 +35,18 @@ const behaviors = {
     }
     return write(path, arrayCopy, stateCopy);
   },
+  [AUTOFILL](state, {field, value}) {
+    return write(field, previous => {
+      const {asyncError, submitError, ...result} = {...previous, value, autofilled: true};
+      return makeFieldValue(result);
+    }, state);
+  },
   [BLUR](state, {field, value, touch}) {
-    // remove _active from state
-    const {_active, ...stateCopy} = state;  // eslint-disable-line prefer-const
+    const {_active, ...stateCopy} = state;
+    if (_active && _active !== field) {
+      // remove _active from state
+      stateCopy._active = _active;
+    }
     return write(field, previous => {
       const result = {...previous};
       if (value !== undefined) {
@@ -50,7 +60,7 @@ const behaviors = {
   },
   [CHANGE](state, {field, value, touch}) {
     return write(field, previous => {
-      const {asyncError, submitError, ...result} = {...previous, value};
+      const {asyncError, submitError, autofilled, ...result} = {...previous, value};
       if (touch) {
         result.touched = true;
       }
@@ -65,9 +75,9 @@ const behaviors = {
     stateCopy._active = field;
     return stateCopy;
   },
-  [INITIALIZE](state, {data, fields}) {
+  [INITIALIZE](state, {data, fields, overwriteValues}) {
     return {
-      ...initializeState(data, fields, state),
+      ...initializeState(data, fields, state, overwriteValues),
       _asyncValidating: false,
       _active: undefined,
       [globalErrorKey]: undefined,
@@ -237,17 +247,8 @@ function decorate(target) {
               ...initialState,
               ...currentResult
             };
-            return {
-              ...formResult,
-              ...mapValues(formNormalizers, (fieldNormalizer, field) => ({
-                ...formResult[field],
-                value: makeFieldValue(fieldNormalizer(
-                  formResult[field] ? formResult[field].value : undefined,         // value
-                  previous && previous[field] ? previous[field].value : undefined, // previous value
-                  getValuesFromState(formResult),                                  // all field values
-                  previousValues))                                                 // all previous field values
-              }))
-            };
+            const values = getValuesFromState(formResult);
+            return normalizeFields(formNormalizers, formResult, previous, values, previousValues);
           };
           if (action.key) {
             return {

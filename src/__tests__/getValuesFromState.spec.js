@@ -60,12 +60,12 @@ describe('getValuesFromState', () => {
     const date1 = new Date();
     const date2 = new Date(date1.getTime() + 1);
     const state = {
-      time1: {
+      time1: makeFieldValue({
         value: date1
-      },
-      time2: {
+      }),
+      time2: makeFieldValue({
         value: date2
-      }
+      })
     };
     expect(getValuesFromState(state))
       .toBeA('object')
@@ -91,12 +91,12 @@ describe('getValuesFromState', () => {
 
   it('should get null values from state', () => {
     const state = {
-      foo: {
+      foo: makeFieldValue({
         value: null
-      },
-      bar: {
+      }),
+      bar: makeFieldValue({
         value: null
-      }
+      })
     };
     expect(getValuesFromState(state))
       .toBeA('object')
@@ -108,12 +108,12 @@ describe('getValuesFromState', () => {
 
   it('should get empty string values from state', () => {
     const state = {
-      foo: {
+      foo: makeFieldValue({
         value: ''
-      },
-      bar: {
+      }),
+      bar: makeFieldValue({
         value: ''
-      }
+      })
     };
     expect(getValuesFromState(state))
       .toBeA('object')
@@ -160,9 +160,9 @@ describe('getValuesFromState', () => {
       },
       bar: [
         {
-          deeper: {
+          deeper: makeFieldValue({
             value: 42
-          }
+          })
         }
       ]
     };
@@ -176,14 +176,23 @@ describe('getValuesFromState', () => {
       });
   });
 
+  it('should ignore empty values from state', () => {
+    const state = {
+      name: makeFieldValue({}),
+    };
+    expect(getValuesFromState(state))
+      .toBeA('object')
+      .toEqual({});
+  });
+
   it('should ignore values starting with _', () => {
     const state = {
-      foo: {
+      foo: makeFieldValue({
         value: 'dog'
-      },
-      bar: {
+      }),
+      bar: makeFieldValue({
         value: 'cat'
-      },
+      }),
       _someMetaValue: 'rat'
     };
     expect(getValuesFromState(state))
@@ -196,12 +205,12 @@ describe('getValuesFromState', () => {
 
   it('should ignore visited fields without values', () => {
     const state = {
-      foo: {
+      foo: makeFieldValue({
         value: 'dog'
-      },
-      bar: {
+      }),
+      bar: makeFieldValue({
         visited: true
-      }
+      })
     };
     expect(getValuesFromState(state))
       .toBeA('object')
@@ -226,5 +235,24 @@ describe('getValuesFromState', () => {
           animals: [{key: 'k1', value: 'v1'}, {key: 'k2', value: 'v2'}]
         }
       });
+  });
+
+  it('should retrieve values from recreated state', () => {
+    const initialState = {
+      foo: makeFieldValue({
+        value: 'bar'
+      })
+    };
+
+    expect(getValuesFromState(initialState)).toEqual({
+      foo: 'bar'
+    });
+
+    const serializedState = JSON.stringify(initialState);
+    const unSerializedState = JSON.parse(serializedState);
+
+    expect(getValuesFromState(unSerializedState)).toEqual({
+      foo: 'bar'
+    });
   });
 });

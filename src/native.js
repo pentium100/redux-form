@@ -1,10 +1,12 @@
 import React from 'react-native';
-import {connect} from 'react-redux/native';
+import {connect} from 'react-redux';
 import createAll from './createAll';
 
 export const {
   actionTypes,
   addArrayValue,
+  autofill,
+  autofillWithKey,
   blur,
   change,
   changeWithKey,

@@ -1,8 +1,11 @@
-import { ADD_ARRAY_VALUE, BLUR, CHANGE, DESTROY, FOCUS, INITIALIZE, REMOVE_ARRAY_VALUE, RESET, START_ASYNC_VALIDATION,
+import { ADD_ARRAY_VALUE, AUTOFILL, BLUR, CHANGE, DESTROY, FOCUS, INITIALIZE, REMOVE_ARRAY_VALUE, RESET, START_ASYNC_VALIDATION,
   START_SUBMIT, STOP_ASYNC_VALIDATION, STOP_SUBMIT, SUBMIT_FAILED, SWAP_ARRAY_VALUES, TOUCH, UNTOUCH } from './actionTypes';
 
-export const addArrayValue = (path, value, index) =>
-  ({type: ADD_ARRAY_VALUE, path, value, index});
+export const addArrayValue = (path, value, index, fields) =>
+  ({type: ADD_ARRAY_VALUE, path, value, index, fields});
+
+export const autofill = (field, value) =>
+  ({type: AUTOFILL, field, value});
 
 export const blur = (field, value) =>
   ({type: BLUR, field, value});
@@ -16,11 +19,11 @@ export const destroy = () =>
 export const focus = field =>
   ({type: FOCUS, field});
 
-export const initialize = (data, fields) => {
+export const initialize = (data, fields, overwriteValues = true) => {
   if (!Array.isArray(fields)) {
     throw new Error('must provide fields array to initialize() action creator');
   }
-  return {type: INITIALIZE, data, fields};
+  return {type: INITIALIZE, data, fields, overwriteValues};
 };
 
 export const removeArrayValue = (path, index) =>

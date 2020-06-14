@@ -120,13 +120,25 @@ describe('write', () => {
   });
 
   it('should put complex array values', () => {
-    const data = write('cat[0].dog[7].rabbit.fox', 'wolf', {});
+    var oldState = {cat:[
+      {
+        dog:[
+          {},{},{},{rabbit:{fox:'abc'}}
+        ]
+      }
+
+    ]};
+    const data = write('cat[0].dog[3].rabbit.fox', 'wolf', oldState);
     expect(data.cat).toBeA('array');
     expect(data.cat[0]).toBeA('object');
     expect(data.cat[0].dog).toBeA('array');
-    expect(data.cat[0].dog[7]).toBeA('object');
-    expect(data.cat[0].dog[7].rabbit).toBeA('object');
-    expect(data.cat[0].dog[7].rabbit.fox).toBe('wolf');
+    expect(data.cat[0].dog[3]).toBeA('object');
+    expect(data.cat[0].dog[3].rabbit).toBeA('object');
+    expect(data.cat[0].dog[3].rabbit.fox).toBe('wolf');
+    expect(oldState.cat[0].dog[3].rabbit.fox).toBe('abc');
+    console.log(oldState.cat[0].dog[3].rabbit.fox);
+    console.log(data.cat[0].dog[3].rabbit.fox);
+
   });
 
   it('should only modify values along path', () => {

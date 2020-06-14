@@ -1,20 +1,22 @@
 import isPristine from './isPristine';
 import isValid from './isValid';
+import isChecked from './isChecked';
 
 /**
  * Updates a field object from the store values
  */
 const updateField = (field, formField, active, syncError) => {
   const diff = {};
+  const formFieldValue = formField.value === undefined ? '' : formField.value;
 
   // update field value
-  if (field.value !== formField.value) {
-    diff.value = formField.value;
-    diff.checked = typeof formField.value === 'boolean' ? formField.value : undefined;
+  if (field.value !== formFieldValue) {
+    diff.value = formFieldValue;
+    diff.checked = isChecked(formFieldValue);
   }
 
   // update dirty/pristine
-  const pristine = isPristine(formField.value, formField.initial);
+  const pristine = isPristine(formFieldValue, formField.initial);
   if (field.pristine !== pristine) {
     diff.dirty = !pristine;
     diff.pristine = pristine;
@@ -42,10 +44,12 @@ const updateField = (field, formField, active, syncError) => {
   if (visited !== field.visited) {
     diff.visited = visited;
   }
+  const autofilled = !!formField.autofilled;
+  if (autofilled !== field.autofilled) {
+    diff.autofilled = autofilled;
+  }
 
   if ('initial' in formField && formField.initial !== field.initialValue) {
-    field.defaultChecked = formField.initial === true;
-    field.defaultValue = formField.initial;
     field.initialValue = formField.initial;
   }
 

@@ -1,9 +1,20 @@
 import expect from 'expect';
+import {createStore} from 'redux';
 import reducer, {globalErrorKey} from '../reducer';
 import bindActionData from '../bindActionData';
-import {addArrayValue, blur, change, focus, initialize, removeArrayValue, reset, startAsyncValidation, startSubmit,
+import {addArrayValue, autofill, blur, change, focus, initialize, removeArrayValue, reset, startAsyncValidation, startSubmit,
   stopAsyncValidation, stopSubmit, swapArrayValues, touch, untouch, destroy} from '../actions';
 import {isFieldValue, makeFieldValue} from '../fieldValue';
+
+const compare = (a, b) => {
+  if (a.value > b.value) {
+    return 1;
+  }
+  if (a.value < b.value) {
+    return -1;
+  }
+  return 0;
+};
 
 describe('reducer', () => {
   it('should initialize state to {}', () => {
@@ -47,7 +58,8 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: undefined
+            value: undefined,
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -71,7 +83,8 @@ describe('reducer', () => {
         myField: {
           myArray: [
             {
-              value: undefined
+              value: undefined,
+              _isFieldValue: true
             }
           ]
         },
@@ -97,7 +110,8 @@ describe('reducer', () => {
         myField: {
           myArray: [
             {
-              value: 20
+              value: 20,
+              _isFieldValue: true
             }
           ]
         },
@@ -139,13 +153,16 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -187,13 +204,16 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           },
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -350,7 +370,7 @@ describe('reducer', () => {
               initial: {a: 'bar-a2', b: 'bar-b2'},
               value: {a: 'bar-a2', b: 'bar-b2'},
             })
-          },
+          }
         ],
         _active: undefined,
         _asyncValidating: false,
@@ -360,7 +380,10 @@ describe('reducer', () => {
         _submitFailed: false
       }
     }, {
-      ...addArrayValue('myField', {foo: {a: 'foo-a3', b: 'foo-b3'}, bar: {a: 'bar-a3', b: 'bar-b3'}}, undefined),
+      ...addArrayValue('myField', {
+        foo: {a: 'foo-a3', b: 'foo-b3'},
+        bar: {a: 'bar-a3', b: 'bar-b3'}
+      }, undefined),
       form: 'testForm'
     });
     expect(state.testForm)
@@ -370,32 +393,38 @@ describe('reducer', () => {
             foo: {
               initial: {a: 'foo-a1', b: 'foo-b1'},
               value: {a: 'foo-a1', b: 'foo-b1'},
+              _isFieldValue: true
             },
             bar: {
               initial: {a: 'bar-a1', b: 'bar-b1'},
               value: {a: 'bar-a1', b: 'bar-b1'},
+              _isFieldValue: true
             }
           },
           {
             foo: {
               initial: {a: 'foo-a2', b: 'foo-b2'},
               value: {a: 'foo-a2', b: 'foo-b2'},
+              _isFieldValue: true
             },
             bar: {
               initial: {a: 'bar-a2', b: 'bar-b2'},
               value: {a: 'bar-a2', b: 'bar-b2'},
+              _isFieldValue: true
             }
           },
           {
             foo: {
               initial: {a: 'foo-a3', b: 'foo-b3'},
               value: {a: 'foo-a3', b: 'foo-b3'},
+              _isFieldValue: true
             },
             bar: {
               initial: {a: 'bar-a3', b: 'bar-b3'},
               value: {a: 'bar-a3', b: 'bar-b3'},
+              _isFieldValue: true
             }
-          },
+          }
         ],
         _active: undefined,
         _asyncValidating: false,
@@ -488,59 +517,69 @@ describe('reducer', () => {
               {
                 foo: {
                   initial: 'foo-1-1',
-                  value: 'foo-1-1'
+                  value: 'foo-1-1',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-1-1',
-                  value: 'bar-1-1'
+                  value: 'bar-1-1',
+                  _isFieldValue: true
                 }
               },
               {
                 foo: {
                   initial: 'foo-1-2',
-                  value: 'foo-1-2'
+                  value: 'foo-1-2',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-1-2',
-                  value: 'bar-1-2'
+                  value: 'bar-1-2',
+                  _isFieldValue: true
                 }
-              },
-            ],
+              }
+            ]
           },
           {
             myField2: [
               {
                 foo: {
                   initial: 'foo-2-1',
-                  value: 'foo-2-1'
+                  value: 'foo-2-1',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-2-1',
-                  value: 'bar-2-1'
+                  value: 'bar-2-1',
+                  _isFieldValue: true
                 }
               },
               {
                 foo: {
                   initial: 'foo-2-2',
-                  value: 'foo-2-2'
+                  value: 'foo-2-2',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-2-2',
-                  value: 'bar-2-2'
+                  value: 'bar-2-2',
+                  _isFieldValue: true
                 }
               },
               {
                 foo: {
                   initial: 'foo-2-3',
-                  value: 'foo-2-3'
+                  value: 'foo-2-3',
+                  _isFieldValue: true
                 },
                 bar: {
                   initial: 'bar-2-3',
-                  value: 'bar-2-3'
+                  value: 'bar-2-3',
+                  _isFieldValue: true
                 }
-              },
-            ],
-          },
+              }
+            ]
+          }
         ],
         _active: undefined,
         _asyncValidating: false,
@@ -571,6 +610,62 @@ describe('reducer', () => {
     expect(isFieldValue(state.testForm.myField[1].myField2[2].bar)).toBe(true);
   });
 
+  it('should set value on autofill with empty state', () => {
+    const state = reducer({}, {
+      ...autofill('myField', 'myValue'),
+      form: 'foo'
+    });
+    expect(state.foo)
+      .toEqual({
+        myField: {
+          value: 'myValue',
+          autofilled: true,
+          _isFieldValue: true
+        },
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      });
+    expect(isFieldValue(state.foo.myField)).toBe(true);
+  });
+
+  it('should set value on autofill with initial value', () => {
+    const state = reducer({
+      foo: {
+        myField: makeFieldValue({
+          value: 'initial'
+        }),
+        _active: 'myField',
+        _asyncValidating: false,
+        [globalErrorKey]: 'Some global error',
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      }
+    }, {
+      ...autofill('myField', 'different'),
+      form: 'foo'
+    });
+    expect(state.foo)
+      .toEqual({
+        myField: {
+          value: 'different',
+          autofilled: true,
+          _isFieldValue: true
+        },
+        _active: 'myField',
+        _asyncValidating: false,
+        [globalErrorKey]: 'Some global error',
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      });
+    expect(isFieldValue(state.foo.myField)).toBe(true);
+  });
+
   it('should set value on blur with empty state', () => {
     const state = reducer({}, {
       ...blur('myField', 'myValue'),
@@ -579,7 +674,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'myValue'
+          value: 'myValue',
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -600,7 +696,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -635,7 +732,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -671,7 +769,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -704,7 +803,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: undefined,
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _asyncValidating: false,
         [globalErrorKey]: undefined,
@@ -723,7 +823,7 @@ describe('reducer', () => {
             value: undefined
           })
         },
-        _active: 'myField',
+        _active: 'myField.mySubField',
         _asyncValidating: false,
         [globalErrorKey]: undefined,
         _initialized: false,
@@ -740,7 +840,8 @@ describe('reducer', () => {
         myField: {
           mySubField: {
             value: 'hello',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         },
         _asyncValidating: false,
@@ -759,7 +860,7 @@ describe('reducer', () => {
         myArray: [
           makeFieldValue({value: undefined})
         ],
-        _active: 'myField',
+        _active: 'myArray[0]',
         _asyncValidating: false,
         [globalErrorKey]: undefined,
         _initialized: false,
@@ -776,7 +877,8 @@ describe('reducer', () => {
         myArray: [
           {
             value: 'hello',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         ],
         _asyncValidating: false,
@@ -796,7 +898,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'myValue'
+          value: 'myValue',
+          _isFieldValue: true
         },
         _active: undefined, // CHANGE doesn't touch _active
         _asyncValidating: false,
@@ -818,7 +921,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined, // CHANGE doesn't touch _active
         _asyncValidating: false,
@@ -855,7 +959,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'myValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -889,7 +994,42 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'different'
+          value: 'different',
+          _isFieldValue: true
+        },
+        _active: 'myField',
+        _asyncValidating: false,
+        [globalErrorKey]: 'Some global error',
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      });
+    expect(isFieldValue(state.foo.myField)).toBe(true);
+  });
+
+  it('should set value on change and remove autofilled', () => {
+    const state = reducer({
+      foo: {
+        myField: makeFieldValue({
+          value: 'initial',
+          autofilled: true
+        }),
+        _active: 'myField',
+        _asyncValidating: false,
+        [globalErrorKey]: 'Some global error',
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      }
+    }, {
+      ...change('myField', 'different'),
+      form: 'foo'
+    });
+    expect(state.foo)
+      .toEqual({
+        myField: {
+          value: 'different',
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -910,7 +1050,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           mySubField: {
-            value: 'myValue'
+            value: 'myValue',
+            _isFieldValue: true
           }
         },
         _active: undefined, // CHANGE doesn't touch _active
@@ -932,7 +1073,8 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          visited: true
+          visited: true,
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -953,7 +1095,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           subField: {
-            visited: true
+            visited: true,
+            _isFieldValue: true
           }
         },
         _active: 'myField.subField',
@@ -991,7 +1134,8 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'initialValue',
-          visited: true
+          visited: true,
+          _isFieldValue: true
         },
         _active: 'myField',
         _asyncValidating: false,
@@ -1012,7 +1156,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'initialValue',
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1033,11 +1178,13 @@ describe('reducer', () => {
       .toEqual({
         bar: {
           initial: 'baz',
-          value: 'baz'
+          value: 'baz',
+          _isFieldValue: true
         },
         dog: {
           initial: null,
-          value: null
+          value: null,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1060,7 +1207,8 @@ describe('reducer', () => {
         myField: {
           subField: {
             initial: 'initialValue',
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -1084,7 +1232,8 @@ describe('reducer', () => {
         myField: [
           {
             initial: 'initialValue',
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1120,21 +1269,25 @@ describe('reducer', () => {
           {
             name: {
               initial: 'Bobby Tables',
-              value: 'Bobby Tables'
+              value: 'Bobby Tables',
+              _isFieldValue: true
             },
             email: {
               initial: 'bobby@gmail.com',
-              value: 'bobby@gmail.com'
+              value: 'bobby@gmail.com',
+              _isFieldValue: true
             }
           },
           {
             name: {
               initial: 'Sammy Tables',
-              value: 'Sammy Tables'
+              value: 'Sammy Tables',
+              _isFieldValue: true
             },
             email: {
               initial: 'sammy@gmail.com',
-              value: 'sammy@gmail.com'
+              value: 'sammy@gmail.com',
+              _isFieldValue: true
             }
           }
         ],
@@ -1177,7 +1330,44 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'cleanValue',
-          value: 'cleanValue'
+          value: 'cleanValue',
+          _isFieldValue: true
+        },
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: true,
+        _submitting: false,
+        _submitFailed: false
+      });
+    expect(isFieldValue(state.foo.myField)).toBe(true);
+  });
+
+  it('should set initialize values, not overwriting values when overwriteValues is false', () => {
+    const state = reducer({
+      foo: {
+        myField: makeFieldValue({
+          value: 'dirtyValue',
+          touched: true
+        }),
+        _active: 'myField',
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      }
+    }, {
+      ...initialize({myField: 'cleanValue'}, ['myField'], false),
+      form: 'foo',
+      touch: true
+    });
+    expect(state.foo)
+      .toEqual({
+        myField: {
+          initial: 'cleanValue',
+          value: 'dirtyValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1215,7 +1405,8 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1285,10 +1476,12 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'bar'
+            value: 'bar',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1332,10 +1525,12 @@ describe('reducer', () => {
       .toEqual({
         myField: [
           {
-            value: 'foo'
+            value: 'foo',
+            _isFieldValue: true
           },
           {
-            value: 'baz'
+            value: 'baz',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -1366,15 +1561,15 @@ describe('reducer', () => {
       form: 'testForm'
     });
     expect(state.testForm)
-        .toEqual({
-          myField: [],
-          _active: undefined,
-          _asyncValidating: false,
-          [globalErrorKey]: undefined,
-          _initialized: false,
-          _submitting: false,
-          _submitFailed: false
-        });
+      .toEqual({
+        myField: [],
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      });
   });
 
   it('should should swap two array values at different indexes', () => {
@@ -1403,25 +1598,28 @@ describe('reducer', () => {
       form: 'testForm'
     });
     expect(state.testForm)
-        .toEqual({
-          myField: [
-            {
-              value: 'baz'
-            },
-            {
-              value: 'bar'
-            },
-            {
-              value: 'foo'
-            }
-          ],
-          _active: undefined,
-          _asyncValidating: false,
-          [globalErrorKey]: undefined,
-          _initialized: false,
-          _submitting: false,
-          _submitFailed: false
-        });
+      .toEqual({
+        myField: [
+          {
+            value: 'baz',
+            _isFieldValue: true
+          },
+          {
+            value: 'bar',
+            _isFieldValue: true
+          },
+          {
+            value: 'foo',
+            _isFieldValue: true
+          }
+        ],
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      });
     expect(isFieldValue(state.testForm.myField)).toBe(false);
     expect(isFieldValue(state.testForm.myField[0])).toBe(true);
     expect(isFieldValue(state.testForm.myField[1])).toBe(true);
@@ -1455,25 +1653,28 @@ describe('reducer', () => {
       form: 'testForm'
     });
     expect(state.testForm)
-        .toEqual({
-          myField: [
-            {
-              value: 'foo'
-            },
-            {
-              value: 'bar'
-            },
-            {
-              value: 'baz'
-            }
-          ],
-          _active: undefined,
-          _asyncValidating: false,
-          [globalErrorKey]: undefined,
-          _initialized: false,
-          _submitting: false,
-          _submitFailed: false
-        });
+      .toEqual({
+        myField: [
+          {
+            value: 'foo',
+            _isFieldValue: true
+          },
+          {
+            value: 'bar',
+            _isFieldValue: true
+          },
+          {
+            value: 'baz',
+            _isFieldValue: true
+          }
+        ],
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      });
     expect(isFieldValue(state.testForm.myField)).toBe(false);
     expect(isFieldValue(state.testForm.myField[0])).toBe(true);
     expect(isFieldValue(state.testForm.myField[1])).toBe(true);
@@ -1507,25 +1708,28 @@ describe('reducer', () => {
       form: 'testForm'
     });
     expect(state.testForm)
-        .toEqual({
-          myField: [
-            {
-              value: 'foo'
-            },
-            {
-              value: 'bar'
-            },
-            {
-              value: 'baz'
-            }
-          ],
-          _active: undefined,
-          _asyncValidating: false,
-          [globalErrorKey]: undefined,
-          _initialized: false,
-          _submitting: false,
-          _submitFailed: false
-        });
+      .toEqual({
+        myField: [
+          {
+            value: 'foo',
+            _isFieldValue: true
+          },
+          {
+            value: 'bar',
+            _isFieldValue: true
+          },
+          {
+            value: 'baz',
+            _isFieldValue: true
+          }
+        ],
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      });
     expect(isFieldValue(state.testForm.myField)).toBe(false);
     expect(isFieldValue(state.testForm.myField[0])).toBe(true);
     expect(isFieldValue(state.testForm.myField[1])).toBe(true);
@@ -1561,11 +1765,13 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'initialValue',
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
-          value: 'otherInitialValue'
+          value: 'otherInitialValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -1609,11 +1815,13 @@ describe('reducer', () => {
         deepField: {
           myField: {
             initial: 'initialValue',
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           myOtherField: {
             initial: 'otherInitialValue',
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -1681,7 +1889,8 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           initial: 'initialValue',
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         doesnt: 'matter',
         should: 'notchange',
@@ -1791,12 +2000,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myField'
           },
           myOtherField: {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myOtherField'
           }
         },
@@ -1850,12 +2061,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myField'
           },
           {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             asyncError: 'Error about myOtherField'
           }
         ],
@@ -1904,12 +2117,14 @@ describe('reducer', () => {
           initial: 'initialValue',
           value: 'dirtyValue',
           touched: true,
+          _isFieldValue: true,
           asyncError: 'Error about myField'
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
           touched: true,
+          _isFieldValue: true,
           asyncError: 'Error about myOtherField'
         },
         _active: undefined,
@@ -1954,12 +2169,14 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'dirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2003,12 +2220,14 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'dirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2088,12 +2307,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myField'
           },
           myOtherField: {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myOtherField'
           }
         },
@@ -2147,12 +2368,14 @@ describe('reducer', () => {
             initial: 'initialValue',
             value: 'dirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myField'
           },
           {
             initial: 'otherInitialValue',
             value: 'otherDirtyValue',
             touched: true,
+            _isFieldValue: true,
             submitError: 'Error about myOtherField'
           }
         ],
@@ -2230,12 +2453,14 @@ describe('reducer', () => {
           initial: 'initialValue',
           value: 'dirtyValue',
           touched: true,
+          _isFieldValue: true,
           submitError: 'Error about myField'
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
           touched: true,
+          _isFieldValue: true,
           submitError: 'Error about myOtherField'
         },
         _active: undefined,
@@ -2280,12 +2505,14 @@ describe('reducer', () => {
         myField: {
           initial: 'initialValue',
           value: 'dirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           initial: 'otherInitialValue',
           value: 'otherDirtyValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2324,11 +2551,13 @@ describe('reducer', () => {
       .toEqual({
         myField: {
           value: 'initialValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         myOtherField: {
           value: 'otherInitialValue',
-          touched: true
+          touched: true,
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2352,7 +2581,7 @@ describe('reducer', () => {
           myOtherField: makeFieldValue({
             value: 'otherInitialValue',
             touched: false
-          }),
+          })
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2370,11 +2599,13 @@ describe('reducer', () => {
         deep: {
           myField: {
             value: 'initialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           },
           myOtherField: {
             value: 'otherInitialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -2418,11 +2649,13 @@ describe('reducer', () => {
         myFields: [
           {
             value: 'initialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           },
           {
             value: 'otherInitialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2466,11 +2699,13 @@ describe('reducer', () => {
         myFields: [
           {
             value: 'initialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           },
           {
             value: 'otherInitialValue',
-            touched: true
+            touched: true,
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2519,13 +2754,15 @@ describe('reducer', () => {
           {
             name: {
               value: 'initialValue',
-              touched: true
+              touched: true,
+              _isFieldValue: true
             }
           },
           {
             name: {
               value: 'otherInitialValue',
-              touched: true
+              touched: true,
+              _isFieldValue: true
             }
           }
         ],
@@ -2618,10 +2855,12 @@ describe('reducer', () => {
     expect(state.foo)
       .toEqual({
         myField: {
-          value: 'initialValue'
+          value: 'initialValue',
+          _isFieldValue: true
         },
         myOtherField: {
-          value: 'otherInitialValue'
+          value: 'otherInitialValue',
+          _isFieldValue: true
         },
         _active: undefined,
         _asyncValidating: false,
@@ -2662,10 +2901,12 @@ describe('reducer', () => {
       .toEqual({
         deep: {
           myField: {
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           myOtherField: {
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         },
         _active: undefined,
@@ -2708,10 +2949,12 @@ describe('reducer', () => {
       .toEqual({
         myFields: [
           {
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           {
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2754,10 +2997,12 @@ describe('reducer', () => {
       .toEqual({
         myFields: [
           {
-            value: 'initialValue'
+            value: 'initialValue',
+            _isFieldValue: true
           },
           {
-            value: 'otherInitialValue'
+            value: 'otherInitialValue',
+            _isFieldValue: true
           }
         ],
         _active: undefined,
@@ -2805,12 +3050,14 @@ describe('reducer', () => {
         myFields: [
           {
             name: {
-              value: 'initialValue'
+              value: 'initialValue',
+              _isFieldValue: true
             }
           },
           {
             name: {
-              value: 'otherInitialValue'
+              value: 'otherInitialValue',
+              _isFieldValue: true
             }
           }
         ],
@@ -2917,148 +3164,693 @@ describe('reducer', () => {
       }
     });
   });
-});
 
-describe('reducer.plugin', () => {
-  it('should initialize form state when there is a reducer plugin', () => {
-    const result = reducer.plugin({
-      foo: (state) => state
-    })();
-    expect(result)
-      .toExist()
-      .toBeA('object');
-    expect(Object.keys(result).length).toBe(1);
-    expect(result.foo)
-      .toExist()
-      .toBeA('object')
-      .toEqual({
+  describe('reducer.plugin', () => {
+    it('should initialize form state when there is a reducer plugin', () => {
+      const result = reducer.plugin({
+        foo: (state) => state
+      })();
+      expect(result)
+        .toExist()
+        .toBeA('object');
+      expect(Object.keys(result).length).toBe(1);
+      expect(result.foo)
+        .toExist()
+        .toBeA('object')
+        .toEqual({
+          _active: undefined,
+          _asyncValidating: false,
+          [globalErrorKey]: undefined,
+          _initialized: false,
+          _submitting: false,
+          _submitFailed: false
+        });
+    });
+  });
+
+  describe('reducer.normalize', () => {
+    it('should initialize form state when there is a normalizer', () => {
+      const state = reducer.normalize({
+        foo: {
+          'myField': () => 'normalized',
+          'person.name': () => 'John Doe',
+          'pets[].name': () => 'Fido'
+        }
+      })();
+      expect(state)
+        .toExist()
+        .toBeA('object');
+      expect(Object.keys(state).length).toBe(1);
+      expect(state.foo)
+        .toExist()
+        .toBeA('object')
+        .toEqual({
+          _active: undefined,
+          _asyncValidating: false,
+          [globalErrorKey]: undefined,
+          _initialized: false,
+          _submitting: false,
+          _submitFailed: false,
+          myField: {
+            value: 'normalized',
+            _isFieldValue: true
+          },
+          person: {
+            name: {
+              value: 'John Doe',
+              _isFieldValue: true
+            }
+          },
+          pets: []
+        });
+    });
+
+    it('should normalize keyed forms depending on action form key', () => {
+      const defaultFields = {
         _active: undefined,
         _asyncValidating: false,
         [globalErrorKey]: undefined,
         _initialized: false,
         _submitting: false,
         _submitFailed: false
+      };
+      const normalize = reducer.normalize({
+        foo: {
+          'myField': () => 'normalized',
+          'person.name': () => 'John Doe',
+          'pets[].name': () => 'Fido'
+        }
       });
-  });
-});
+      const state = normalize({
+        foo: {
+          firstSubform: {}
+        }
+      }, {
+        form: 'foo',
+        key: 'firstSubform'
+      });
+      const nextState = normalize(state, {
+        form: 'foo',
+        key: 'secondSubForm'
+      });
+      expect(state)
+        .toExist()
+        .toBeA('object');
+      expect(Object.keys(state).length).toBe(1);
+      expect(state.foo)
+        .toExist()
+        .toBeA('object')
+        .toEqual({
+          firstSubform: {
+            ...defaultFields,
+            myField: {
+              value: 'normalized',
+              _isFieldValue: true
+            },
+            person: {
+              name: {
+                value: 'John Doe',
+                _isFieldValue: true
+              }
+            },
+            pets: []
+          }
+        });
+      expect(nextState.foo)
+        .toEqual({
+          firstSubform: {
+            ...defaultFields,
+            myField: {
+              value: 'normalized',
+              _isFieldValue: true
+            },
+            person: {
+              name: {
+                value: 'John Doe',
+                _isFieldValue: true
+              }
+            },
+            pets: []
+          },
+          secondSubForm: {
+            ...defaultFields,
+            myField: {
+              value: 'normalized',
+              _isFieldValue: true
+            },
+            person: {
+              name: {
+                value: 'John Doe',
+                _isFieldValue: true
+              }
+            },
+            pets: []
+          }
+        });
+    });
 
-describe('reducer.normalize', () => {
-  it('should initialize form state when there is a normalizer', () => {
-    const state = reducer.normalize({
-      foo: {
-        myField: () => 'normalized'
-      }
-    })();
-    expect(state)
-      .toExist()
-      .toBeA('object');
-    expect(Object.keys(state).length).toBe(1);
-    expect(state.foo)
-      .toExist()
-      .toBeA('object')
-      .toEqual({
+    it('should normalize simple form values', () => {
+      const defaultFields = {
         _active: undefined,
         _asyncValidating: false,
         [globalErrorKey]: undefined,
         _initialized: false,
         _submitting: false,
-        _submitFailed: false,
-        myField: {
-          value: 'normalized'
+        _submitFailed: false
+      };
+      const normalize = reducer.normalize({
+        foo: {
+          'name': () => 'normalized',
+          'person.name': (name) => name && name.toUpperCase(),
+          'pets[].name': (name) => name && name.toLowerCase()
         }
       });
+      const state = normalize({
+        foo: {
+          name: {
+            value: 'dog'
+          },
+          person: {
+            name: {
+              value: 'John Doe',
+              _isFieldValue: true
+            }
+          },
+          pets: [
+            {
+              name: {
+                value: 'Fido',
+                _isFieldValue: true
+              }
+            },
+            {
+              name: {
+                value: 'Tucker',
+                _isFieldValue: true
+              }
+            }
+          ]
+        }
+      });
+      expect(state)
+        .toExist()
+        .toBeA('object');
+      expect(state.foo)
+        .toExist()
+        .toBeA('object')
+        .toEqual({
+          ...defaultFields,
+          name: {
+            value: 'normalized',
+            _isFieldValue: true
+          },
+          person: {
+            name: {
+              value: 'JOHN DOE',
+              _isFieldValue: true
+            }
+          },
+          pets: [
+            {
+              name: {
+                value: 'fido',
+                _isFieldValue: true
+              }
+            },
+            {
+              name: {
+                value: 'tucker',
+                _isFieldValue: true
+              }
+            }
+          ]
+        });
+    });
+
+    it('should allow resetForm to work on a normalized form', () => {
+      const defaultFields = {
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      };
+      const normalizingReducer = reducer.normalize({
+        foo: {
+          'name': value => value && value.toUpperCase(),
+          'person.name': (name) => name && name.toUpperCase(),
+          'pets[].name': (name) => name && name.toLowerCase()
+        }
+      });
+      const empty = normalizingReducer();
+      let state = normalizingReducer(empty, {
+        form: 'foo',
+        ...change('name', 'dog'),
+      });
+      state = normalizingReducer(state, {
+        form: 'foo',
+        ...change('person.name', 'John Doe'),
+      });
+      state = normalizingReducer(state, {
+        form: 'foo',
+        ...addArrayValue('pets', {name: 'Fido'})
+      });
+      expect(state)
+        .toExist()
+        .toBeA('object');
+      expect(state.foo)
+        .toExist()
+        .toBeA('object')
+        .toEqual({
+          ...defaultFields,
+          name: {
+            value: 'DOG',
+            _isFieldValue: true
+          },
+          person: {
+            name: {
+              value: 'JOHN DOE',
+              _isFieldValue: true
+            }
+          },
+          pets: [{
+            name: {
+              initial: 'Fido',
+              value: 'fido',
+              _isFieldValue: true
+            }
+          }]
+        });
+      const result = normalizingReducer(state, {
+        form: 'foo',
+        ...reset()
+      });
+      expect(result)
+        .toExist()
+        .toBeA('object');
+      expect(result.foo)
+        .toExist()
+        .toBeA('object')
+        .toEqual({
+          ...defaultFields,
+          name: {
+            value: undefined,
+            _isFieldValue: true
+          },
+          person: {
+            name: {
+              value: undefined,
+              _isFieldValue: true
+            }
+          },
+          pets: [{
+            name: {
+              initial: 'Fido',
+              value: 'fido',
+              _isFieldValue: true
+            }
+          }]
+        });
+    });
+
+    it('should normalize arbitrarily deeply nested fields', () => {
+      const defaultFields = {
+        _active: undefined,
+        _asyncValidating: false,
+        [globalErrorKey]: undefined,
+        _initialized: false,
+        _submitting: false,
+        _submitFailed: false
+      };
+      const normalize = reducer.normalize({
+        foo: {
+          'name': () => 'normalized',
+          'person.name': (name) => name && name.toUpperCase(),
+          'pets[].name': (name) => name && name.toLowerCase(),
+          'cats[]': (array) => array && array.map(({value}) => ({value: value.toUpperCase()})),
+          'programming[].langs[]': (array) => array && array.slice(0).sort(compare),
+          'some.numbers[]': (array) => array && array.filter(({value}) => value % 2 === 0),
+          'a.very.deep.object.property': (value) => value && value.toUpperCase(),
+          'my[].deeply[].nested.item': (value) => value && value.toUpperCase()
+        }
+      });
+      const state = normalize({
+        foo: {
+          person: {
+            name: makeFieldValue({value: 'John Doe'})
+          },
+          pets: [
+            {name: makeFieldValue({value: 'Fido'})},
+            {name: makeFieldValue({value: 'Tucker'})}
+          ],
+          cats: [
+            makeFieldValue({value: 'lion'}),
+            makeFieldValue({value: 'panther'}),
+            makeFieldValue({value: 'garfield'}),
+            makeFieldValue({value: 'whiskers'})
+          ],
+          programming: [{
+            langs: [
+              makeFieldValue({value: 'ml'}),
+              makeFieldValue({value: 'ocaml'}),
+              makeFieldValue({value: 'lisp'}),
+              makeFieldValue({value: 'haskell'}),
+              makeFieldValue({value: 'f#'})
+            ]
+          }, {
+            langs: [
+              makeFieldValue({value: 'smalltalk'}),
+              makeFieldValue({value: 'ruby'}),
+              makeFieldValue({value: 'java'}),
+              makeFieldValue({value: 'c#'}),
+              makeFieldValue({value: 'c++'})
+            ]
+          }],
+          some: {
+            numbers: [
+              makeFieldValue({value: 1}),
+              makeFieldValue({value: 2}),
+              makeFieldValue({value: 3}),
+              makeFieldValue({value: 4}),
+              makeFieldValue({value: 5}),
+              makeFieldValue({value: 6}),
+              makeFieldValue({value: 7}),
+              makeFieldValue({value: 8}),
+              makeFieldValue({value: 9}),
+              makeFieldValue({value: 10})
+            ]
+          },
+          a: {
+            very: {
+              deep: {
+                object: {
+                  property: makeFieldValue({value: 'test'})
+                }
+              }
+            }
+          },
+          my: [{
+            deeply: [{
+              nested: {
+                item: makeFieldValue({value: 'hello'}),
+                not: makeFieldValue({value: 'lost'})
+              },
+              otherKey: makeFieldValue({value: 'Goodbye'})
+            }, {
+              nested: {
+                item: makeFieldValue({value: 'hola'}),
+                not: makeFieldValue({value: 'lost'})
+              },
+              otherKey: makeFieldValue({value: 'Adios'})
+            }],
+            stays: makeFieldValue({value: 'intact'})
+          }, {
+            deeply: [{
+              nested: {
+                item: makeFieldValue({value: 'world'}),
+                not: makeFieldValue({value: 'lost'})
+              },
+              otherKey: makeFieldValue({value: 'Later'})
+            }, {
+              nested: {
+                item: makeFieldValue({value: 'mundo'}),
+                not: makeFieldValue({value: 'lost'})
+              },
+              otherKey: makeFieldValue({value: 'Hasta luego'})
+            }],
+            stays: makeFieldValue({value: 'intact'})
+          }]
+        }
+      });
+      expect(state)
+        .toExist()
+        .toBeA('object');
+      expect(state.foo)
+        .toExist()
+        .toBeA('object')
+        .toEqual({
+          ...defaultFields,
+          name: {
+            value: 'normalized',
+            _isFieldValue: true
+          },
+          person: {
+            name: {
+              value: 'JOHN DOE',
+              _isFieldValue: true
+            }
+          },
+          pets: [
+            {
+              name: {
+                value: 'fido',
+                _isFieldValue: true
+              }
+            },
+            {
+              name: {
+                value: 'tucker',
+                _isFieldValue: true
+              }
+            }
+          ],
+          cats: [
+            {
+              value: 'LION',
+              _isFieldValue: true
+            },
+            {
+              value: 'PANTHER',
+              _isFieldValue: true
+            },
+            {
+              value: 'GARFIELD',
+              _isFieldValue: true
+            },
+            {
+              value: 'WHISKERS',
+              _isFieldValue: true
+            }
+          ],
+          programming: [{
+            langs: [
+              {
+                value: 'f#',
+                _isFieldValue: true
+              },
+              {
+                value: 'haskell',
+                _isFieldValue: true
+              },
+              {
+                value: 'lisp',
+                _isFieldValue: true
+              },
+              {
+                value: 'ml',
+                _isFieldValue: true
+              },
+              {
+                value: 'ocaml',
+                _isFieldValue: true
+              }
+            ]
+          }, {
+            langs: [
+              {
+                value: 'c#',
+                _isFieldValue: true
+              },
+              {
+                value: 'c++',
+                _isFieldValue: true
+              },
+              {
+                value: 'java',
+                _isFieldValue: true
+              },
+              {
+                value: 'ruby',
+                _isFieldValue: true
+              },
+              {
+                value: 'smalltalk',
+                _isFieldValue: true
+              }
+            ]
+          }],
+          some: {
+            numbers: [
+              {
+                value: 2,
+                _isFieldValue: true
+              },
+              {
+                value: 4,
+                _isFieldValue: true
+              },
+              {
+                value: 6,
+                _isFieldValue: true
+              },
+              {
+                value: 8,
+                _isFieldValue: true
+              },
+              {
+                value: 10,
+                _isFieldValue: true
+              }
+            ]
+          },
+          a: {
+            very: {
+              deep: {
+                object: {
+                  property: {
+                    value: 'TEST',
+                    _isFieldValue: true
+                  }
+                }
+              }
+            }
+          },
+          my: [{
+            deeply: [{
+              nested: {
+                item: {
+                  value: 'HELLO',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
+              },
+              otherKey: {
+                value: 'Goodbye',
+                _isFieldValue: true
+              }
+            }, {
+              nested: {
+                item: {
+                  value: 'HOLA',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
+              },
+              otherKey: {
+                value: 'Adios',
+                _isFieldValue: true
+              }
+            }],
+            stays: {
+              value: 'intact',
+              _isFieldValue: true
+            }
+          }, {
+            deeply: [{
+              nested: {
+                item: {
+                  value: 'WORLD',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
+              },
+              otherKey: {
+                value: 'Later',
+                _isFieldValue: true
+              }
+            }, {
+              nested: {
+                item: {
+                  value: 'MUNDO',
+                  _isFieldValue: true
+                },
+                not: {
+                  value: 'lost',
+                  _isFieldValue: true
+                }
+              },
+              otherKey: {
+                value: 'Hasta luego',
+                _isFieldValue: true
+              }
+            }],
+            stays: {
+              value: 'intact',
+              _isFieldValue: true
+            }
+          }]
+        });
+      expect(isFieldValue(state.foo.name)).toBe(true);
+      expect(isFieldValue(state.foo.person.name)).toBe(true);
+      expect(isFieldValue(state.foo.pets[0].name)).toBe(true);
+      expect(isFieldValue(state.foo.pets[1].name)).toBe(true);
+      expect(isFieldValue(state.foo.cats[0])).toBe(true);
+      expect(isFieldValue(state.foo.cats[1])).toBe(true);
+      expect(isFieldValue(state.foo.cats[2])).toBe(true);
+      expect(isFieldValue(state.foo.cats[3])).toBe(true);
+      expect(isFieldValue(state.foo.programming[0].langs[0])).toBe(true);
+      expect(isFieldValue(state.foo.programming[0].langs[1])).toBe(true);
+      expect(isFieldValue(state.foo.programming[0].langs[2])).toBe(true);
+      expect(isFieldValue(state.foo.programming[0].langs[3])).toBe(true);
+      expect(isFieldValue(state.foo.programming[0].langs[4])).toBe(true);
+      expect(isFieldValue(state.foo.programming[1].langs[0])).toBe(true);
+      expect(isFieldValue(state.foo.programming[1].langs[1])).toBe(true);
+      expect(isFieldValue(state.foo.programming[1].langs[2])).toBe(true);
+      expect(isFieldValue(state.foo.programming[1].langs[3])).toBe(true);
+      expect(isFieldValue(state.foo.programming[1].langs[4])).toBe(true);
+      expect(isFieldValue(state.foo.some.numbers[0])).toBe(true);
+      expect(isFieldValue(state.foo.some.numbers[1])).toBe(true);
+      expect(isFieldValue(state.foo.some.numbers[2])).toBe(true);
+      expect(isFieldValue(state.foo.some.numbers[3])).toBe(true);
+      expect(isFieldValue(state.foo.some.numbers[4])).toBe(true);
+      expect(isFieldValue(state.foo.a.very.deep.object.property)).toBe(true);
+      expect(isFieldValue(state.foo.my[0].deeply[0].nested.item)).toBe(true);
+      expect(isFieldValue(state.foo.my[0].deeply[0].nested.not)).toBe(true);
+      expect(isFieldValue(state.foo.my[0].deeply[0].otherKey)).toBe(true);
+      expect(isFieldValue(state.foo.my[0].deeply[1].nested.item)).toBe(true);
+      expect(isFieldValue(state.foo.my[0].deeply[1].nested.not)).toBe(true);
+      expect(isFieldValue(state.foo.my[0].deeply[1].otherKey)).toBe(true);
+      expect(isFieldValue(state.foo.my[0].stays)).toBe(true);
+      expect(isFieldValue(state.foo.my[1].deeply[0].nested.item)).toBe(true);
+      expect(isFieldValue(state.foo.my[1].deeply[0].nested.not)).toBe(true);
+      expect(isFieldValue(state.foo.my[1].deeply[0].otherKey)).toBe(true);
+      expect(isFieldValue(state.foo.my[1].deeply[1].nested.item)).toBe(true);
+      expect(isFieldValue(state.foo.my[1].deeply[1].nested.not)).toBe(true);
+      expect(isFieldValue(state.foo.my[1].deeply[1].otherKey)).toBe(true);
+      expect(isFieldValue(state.foo.my[1].stays)).toBe(true);
+    });
   });
 
-  it('should normalize keyed forms depending on action form key', () => {
-    const defaultFields = {
-      _active: undefined,
-      _asyncValidating: false,
-      [globalErrorKey]: undefined,
-      _initialized: false,
-      _submitting: false,
-      _submitFailed: false
-    };
-    const normalize = reducer.normalize({
-      foo: {
-        myField: () => 'normalized'
-      }
-    });
-    const state = normalize({
-      foo: {
-        firstSubform: {}
-      }
-    }, {
-      form: 'foo',
-      key: 'firstSubform'
-    });
-    const nextState = normalize(state, {
-      form: 'foo',
-      key: 'secondSubForm'
-    });
-    expect(state)
-      .toExist()
-      .toBeA('object');
-    expect(Object.keys(state).length).toBe(1);
-    expect(state.foo)
-      .toExist()
-      .toBeA('object')
-      .toEqual({
-        firstSubform: {
-          ...defaultFields,
-          myField: {
-            value: 'normalized'
-          }
-        }
-      });
-    expect(nextState.foo)
-      .toEqual({
-        firstSubform: {
-          ...defaultFields,
-          myField: {
-            value: 'normalized'
-          }
-        },
-        secondSubForm: {
-          ...defaultFields,
-          myField: {
-            value: 'normalized'
-          }
-        }
-      });
-  });
+  it('should flag the correct field as active', () => {
+    const store = createStore(reducer);
 
-  it('should normalize simple form values', () => {
-    const defaultFields = {
-      _active: undefined,
-      _asyncValidating: false,
-      [globalErrorKey]: undefined,
-      _initialized: false,
-      _submitting: false,
-      _submitFailed: false
-    };
-    const normalize = reducer.normalize({
-      foo: {
-        name: () => 'normalized'
-      }
+    store.dispatch({form: 'foo', ...initialize({}, ['a', 'b'])});
+    store.dispatch({form: 'foo', ...focus('a')});
+    store.dispatch({form: 'foo', ...focus('b')});
+
+    expect(store.getState()).toMatch({
+      foo: {_active: 'b'}
     });
-    const state = normalize({
-      foo: {
-        name: {
-          value: 'dog'
-        }
-      }
+
+    store.dispatch({form: 'foo', ...blur('a')});
+
+    expect(store.getState()).toMatch({
+      foo: {_active: 'b'}
     });
-    expect(state)
-      .toExist()
-      .toBeA('object');
-    expect(state.foo)
-      .toExist()
-      .toBeA('object')
-      .toEqual({
-        ...defaultFields,
-        name: {
-          value: 'normalized'
-        }
-      });
+
+    store.dispatch({form: 'foo', ...blur('b')});
+
+    expect(store.getState().foo)
+      .toExcludeKey('_active');
   });
 });

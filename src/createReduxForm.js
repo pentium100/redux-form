@@ -12,16 +12,28 @@ const createReduxForm =
       WrappedComponent => {
         const ReduxFormConnector = reduxFormConnector(WrappedComponent, mapStateToProps, mapDispatchToProps, mergeProps, options);
         const configWithDefaults = {
+          overwriteOnInitialValuesChange: true,
           touchOnBlur: true,
           touchOnChange: false,
           destroyOnUnmount: true,
           ...config
         };
         class ConnectedForm extends Component {
+          constructor(props) {
+            super(props);
+
+            this.handleSubmitPassback = this.handleSubmitPassback.bind(this);
+          }
+
+          handleSubmitPassback(submit) {
+            this.submit = submit;
+          }
+
           render() {
             return (<ReduxFormConnector
               {...configWithDefaults}
-              {...this.props}/>);
+              {...this.props}
+              submitPassback={this.handleSubmitPassback}/>);
           }
         }
         return hoistStatics(ConnectedForm, WrappedComponent);

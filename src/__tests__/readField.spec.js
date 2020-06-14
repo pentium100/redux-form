@@ -21,7 +21,8 @@ describe('readField', () => {
     initialValues: {},
     readonly: false,
     addArrayValue: noop,
-    removeArrayValue: noop
+    removeArrayValue: noop,
+    fields: []
   };
 
   const expectField = ({field, name, value, dirty, touched, visited, error, initialValue, readonly, checked}) => {
@@ -68,8 +69,6 @@ describe('readField', () => {
       expect(focus.calls.length).toBe(1);
       expect(focus).toHaveBeenCalled();
     }
-    expect(field.defaultChecked).toBe(initialValue === true);
-    expect(field.defaultValue).toBe(initialValue);
     expect(field.initialValue).toBe(initialValue);
     expect(field.error).toBe(error);
     expect(field.valid).toBe(!error);
@@ -91,12 +90,12 @@ describe('readField', () => {
     expectField({
       field: fields.foo,
       name: 'foo',
-      value: undefined,
+      value: '',
       dirty: false,
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -116,7 +115,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -162,7 +161,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'fooError',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -182,7 +181,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false,
       checked: true
     });
@@ -199,7 +198,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false,
       checked: false
     });
@@ -220,7 +219,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     const beforeField = fields.foo;
@@ -237,7 +236,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     const afterField = fields.foo;
@@ -250,12 +249,12 @@ describe('readField', () => {
     expectField({
       field: fields.foo.baz,
       name: 'foo.baz',
-      value: undefined,
+      value: '',
       dirty: false,
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -277,7 +276,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -333,7 +332,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'bazError',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -359,7 +358,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'bazError',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     const beforeFoo = fields.foo;
@@ -383,12 +382,12 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'bazError',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     const afterFoo = fields.foo;
     const afterField = fields.foo.baz;
-    expect(beforeFoo).toBe(afterFoo);         // field container instance should be same
+    expect(beforeFoo).toNotBe(afterFoo);         // field container instance should be same
     expect(beforeField).toNotBe(afterField);  // field instance should be different
   });
 
@@ -415,7 +414,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     expectField({
@@ -426,7 +425,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     expect(fields.foo[2]).toBe(undefined);
@@ -487,7 +486,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'error1',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     expectField({
@@ -498,7 +497,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'error2',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -521,7 +520,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'error1',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     expectField({
@@ -532,7 +531,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'error2',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     const beforeArray = fields.foo;
@@ -554,7 +553,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'error1',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     expectField({
@@ -565,7 +564,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'error2',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
     const afterArray = fields.foo;
@@ -591,7 +590,38 @@ describe('readField', () => {
     fields.foo.addField('rabbit');
     expect(spy)
       .toHaveBeenCalled()
-      .toHaveBeenCalledWith('foo', 'rabbit', undefined);
+      .toHaveBeenCalledWith('foo', 'rabbit', undefined, []);
+  });
+
+  it('should allow an array field to add a deeply nested value', () => {
+    const spy = createSpy();
+    const fields = {};
+    readField({
+      foo: [
+        {
+          bar: [
+            { baz: 'foo[0].bar[0].baz' },
+            { baz: 'foo[0].bar[1].baz' }
+          ]
+        },
+        {
+          bar: [
+            { baz: 'foo[1].bar[0].baz' },
+            { baz: 'foo[1].bar[1].baz' }
+          ]
+        }
+      ]
+    }, 'foo[]', undefined, fields, {}, undefined, false, {
+      ...defaultProps,
+      addArrayValue: spy,
+      fields: [
+        'foo[].bar[].baz'
+      ]
+    });
+    fields.foo.addField('rabbit');
+    expect(spy)
+      .toHaveBeenCalled()
+      .toHaveBeenCalledWith('foo', 'rabbit', undefined, ['bar[].baz']);
   });
 
   it('should allow an array field to remove a value', () => {
@@ -673,7 +703,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -764,7 +794,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: 'syncError',
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });
@@ -784,7 +814,7 @@ describe('readField', () => {
       touched: false,
       visited: false,
       error: undefined,
-      initialValue: undefined,
+      initialValue: '',
       readonly: false
     });
   });

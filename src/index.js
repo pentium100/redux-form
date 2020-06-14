@@ -2,9 +2,17 @@ import React from 'react';
 import {connect} from 'react-redux';
 import createAll from './createAll';
 
+const isNative =
+  typeof window !== 'undefined' &&
+  window.navigator &&
+  window.navigator.product &&
+  window.navigator.product === 'ReactNative';
+
 export const {
   actionTypes,
   addArrayValue,
+  autofill,
+  autofillWithKey,
   blur,
   change,
   changeWithKey,
@@ -27,4 +35,4 @@ export const {
   touchWithKey,
   untouch,
   untouchWithKey
-} = createAll(false, React, connect);
+} = createAll(isNative, React, connect);
